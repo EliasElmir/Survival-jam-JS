@@ -1,8 +1,13 @@
 let player;
 let zombies = [];
 let playerLives = 3;
+let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
+let projectiles = []; 
+let authorizetoshoot = true;
+let lastprojectiles = 0;
+let projectiledelay = 0.3;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
 
@@ -26,8 +31,33 @@ function draw() {
   player.display();
   player.move();
 
-  let currentTime = millis();
+  projectilethrow();
+  zombielogical();
   
+  displayInfo();
+}
+
+function projectilethrow() {
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    projectiles[i].display();
+    projectiles[i].move();
+    if (projectiles[i].x > width) {
+      projectiles.splice(i, 1);
+    } else {
+      for (let j = zombies.length - 1; j >= 0; j--) {
+        if (projectiles[i] && projectiles[i].hits(zombies[j])) {
+          zombies.splice(j, 1);
+          projectiles.splice(i, 1);
+          scorebarre += 50;
+          break;
+        }
+      }
+    }
+  }
+}
+
+function zombielogical() {
+  let currentTime = millis();
   if (currentTime - lastSpawnTime > spawnDelay) {
     zombies.push(new Zombie(width, player.y, 50));
     lastSpawnTime = currentTime;
@@ -36,20 +66,21 @@ function draw() {
   for (let i = zombies.length - 1; i >= 0; i--) {
     zombies[i].display();
     zombies[i].move();
-    
     if (zombies[i].hits(player)) {
       playerLives--;
-      zombies.splice(i, 1);
       if (playerLives <= 0) {
         noLoop();
         console.log("Game Over!");
       }
     }
   }
+}
 
+function displayInfo() {
   fill(0);
   textSize(20);
   text(`Lives: ${playerLives}`, 10, 30);
+  text(`Score: ${scorebarre}`, 10, 60);
 }
 
 class Player {
@@ -69,6 +100,14 @@ class Player {
     if (keyIsDown(RIGHT_ARROW)) this.x += this.speed;
     if (keyIsDown(UP_ARROW)) this.y -= this.speed;
     if (keyIsDown(DOWN_ARROW)) this.y += this.speed;
+    if (keyIsDown(65) && authorizetoshoot) {
+      projectiles.push(new Projectile(this.x + this.size / 2, this.y + this.size / 2));
+      lastprojectiles = millis();
+      authorizetoshoot = false;
+    }
+    if (!authorizetoshoot && millis() - lastprojectiles > projectiledelay * 1000) {
+      authorizetoshoot = true;
+    }
   }
 }
 
@@ -91,5 +130,28 @@ class Zombie {
   hits(player) {
     let d = dist(this.x, this.y, player.x, player.y);
     return d < this.size / 2 + player.size / 2;
+  }
+}
+
+class Projectile {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = 10;
+    this.speed = 10;
+  }
+
+  display() {
+    fill(255, 0, 0);
+    ellipse(this.x, this.y, this.size, this.size);
+  }
+
+  move() {
+    this.x += this.speed;
+  }
+
+  hits(zombie) {
+    let d = dist(this.x, this.y, zombie.x, zombie.y);
+    return d < this.size / 2 + zombie.size / 2;
   }
 }
