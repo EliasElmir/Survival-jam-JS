@@ -7,7 +7,7 @@ let ImageSurvivant;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
-let projectiledelay = 0.3;
+let projectiledelay = 1;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
 
@@ -23,6 +23,15 @@ function windowResized() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player(20, height - 373, 50);
+}
+
+function restartGame() {
+  playerLives = 3;
+  scorebarre = 0;
+  zombies = [];
+  projectiles = [];
+  loop();
+  document.getElementById('game-over').style.display = 'none';
 }
 
 function draw() {
@@ -71,6 +80,7 @@ function zombielogical() {
       if (playerLives <= 0) {
         noLoop();
         console.log("Game Over!");
+        document.getElementById('game-over').style.display = 'block';
       }
     }
   }

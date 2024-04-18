@@ -12,6 +12,20 @@
             overflow: hidden; 
         }
 
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        #game-over button {
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
         canvas {
             display: block;
             margin: auto;
@@ -23,5 +37,14 @@
     <script src="index.js"></script>
 </head>
 <body>
+    <div id="game-over">
+        <p>Game Over</p>
+        <button id="restart-button">Restart</button>
+    </div>
+    <script>
+        document.getElementById('restart-button').addEventListener('click', function() {
+            restartGame();
+        });
+    </script>
 </body>
 </html>
