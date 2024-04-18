@@ -1,8 +1,15 @@
 let player;
 let zombies = [];
 let playerLives = 3;
+let ImageZombie;
+let ImageSurvivant;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
+
+function preload() {
+  ImageZombie = loadImage('[removal.ai]_a2f6fc48-1e53-4dd7-9aac-f698a64786d5-zombzomb.png');
+  ImageSurvivant = loadImage('[removal.ai]_44584a0c-ccce-47d6-b319-183254945aa8-image.png');
+}
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -22,7 +29,7 @@ function draw() {
   let currentTime = millis();
   
   if (currentTime - lastSpawnTime > spawnDelay) {
-    zombies.push(new Zombie(width, player.y, 30));
+    zombies.push(new Zombie(width, player.y, 50));
     lastSpawnTime = currentTime;
   }
 
@@ -54,8 +61,7 @@ class Player {
   }
 
   display() {
-    fill(0, 0, 255);
-    ellipse(this.x, this.y, this.size, this.size);
+    image(ImageSurvivant, this.x, this.y, this.size, this.size);
   }
 
   move() {
@@ -75,8 +81,7 @@ class Zombie {
   }
 
   display() {
-    fill(255, 0, 0);
-    ellipse(this.x, this.y, this.size, this.size);
+    image(ImageZombie, this.x, this.y, this.size, this.size);
   }
 
   move() {
