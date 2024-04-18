@@ -77,10 +77,11 @@ function zombielogical() {
     zombies[i].move();
     if (zombies[i].hits(player)) {
       playerLives--;
+      zombies.splice(i, 1);
       if (playerLives <= 0) {
         noLoop();
         console.log("Game Over!");
-        document.getElementById('game-over').style.display = 'block';
+        document.getElementById('game-over').style.display = 'block'; // Affiche le message de fin de jeu
       }
     }
   }
