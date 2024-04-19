@@ -4,18 +4,16 @@ let playerLives = 3;
 let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
-let ImageBoss1;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
-let projectiledelay = 0.3;
+let projectiledelay = 1;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
 
 function preload() {
   ImageZombie = loadImage('[removal.ai]_a2f6fc48-1e53-4dd7-9aac-f698a64786d5-zombzomb.png');
   ImageSurvivant = loadImage('[removal.ai]_44584a0c-ccce-47d6-b319-183254945aa8-image.png');
-  ImageBoss1 = loadImage('template.html/[removal.ai]_364e80ee-ad9a-443d-8735-3e47e6c58929-cartoon-zombie-pixel-design_61878-716.png')
 }
 
 function windowResized() {
@@ -25,6 +23,15 @@ function windowResized() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player(20, height - 373, 50);
+}
+
+function restartGame() {
+  playerLives = 3;
+  scorebarre = 0;
+  zombies = [];
+  projectiles = [];
+  loop();
+  document.getElementById('game-over').style.display = 'none';
 }
 
 function draw() {
@@ -70,9 +77,11 @@ function zombielogical() {
     zombies[i].move();
     if (zombies[i].hits(player)) {
       playerLives--;
+      zombies.splice(i, 1);
       if (playerLives <= 0) {
         noLoop();
         console.log("Game Over!");
+        document.getElementById('game-over').style.display = 'block'; // Affiche le message de fin de jeu
       }
     }
   }
@@ -156,18 +165,4 @@ class Projectile {
     let d = dist(this.x, this.y, zombie.x, zombie.y);
     return d < this.size / 2 + zombie.size / 2;
   }
-}
-class Boss{
-  constructor(x, y, size){
-    this.x = x;
-    this.y = y;
-    this.z = z;
-    this.speed = 1;
-  }
-  display(){
-    image(ImageBoss1, this.x, this.y, this.size, this.size)
-  }
-}
-function bossLogical(){
-  
 }
