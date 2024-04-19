@@ -90,7 +90,7 @@ function zombielogical() {
 
 function displayInfo() {
   fill(0);
-  textSize(20);
+  textSize(35);
   text(`Lives: ${playerLives}`, 10, 30);
   text(`Score: ${scorebarre}`, 10, 60);
 }
