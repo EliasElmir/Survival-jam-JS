@@ -4,6 +4,7 @@ let playerLives = 3;
 let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
+let ImageBoss1;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
@@ -165,4 +166,25 @@ class Projectile {
     let d = dist(this.x, this.y, zombie.x, zombie.y);
     return d < this.size / 2 + zombie.size / 2;
   }
+}
+class Boss1{
+  constructor(x, y, size) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = 1;
+  }
+  display() {
+    image(ImageBoss1, this.x, this.y, this.size, this.size);
+  }
+
+  move() {
+    this.x -= this.speed;
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x, player.y);
+    return d < this.size / 2 + player.size / 2;
+  }
+
 }
