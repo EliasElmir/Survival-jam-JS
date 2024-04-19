@@ -1,0 +1,29 @@
+/*
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; 
+}
+canvas {
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: calc(100% - 100px);
+}
+*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+#canvas1 {
+    width:800px;
+    height: 500px;
+    border: 4px black;
+}
