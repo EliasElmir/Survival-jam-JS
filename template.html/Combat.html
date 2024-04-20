@@ -3,12 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
     <title>Mon Jeu de Survie</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; 
+        }
+
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        #game-over button {
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        canvas {
+            display: block;
+            margin: auto;
+            width: 100%;
+            height: calc(100% - 100px);
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="index.js"></script>
 </head>
-
 <body>
+    <div id="game-over">
+        <p>Game Over</p>
+        <button id="restart-button">Restart</button>
+    </div>
+    <script>
+        document.getElementById('restart-button').addEventListener('click', function() {
+            restartGame();
+        });
+    </script>
 </body>
 </html>
