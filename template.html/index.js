@@ -5,17 +5,30 @@ let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
 let ImageBOSS;
+let ImageBoss2;
+let ImageBoss3;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
-let projectiledelay = 1;
+let projectiledelay = 0.3;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
+let playerTeam = [];
+let conversiontozombieally = 0.5;
+let placezombieally = {
+  front: null,
+  top: null,
+  bottom: null
+};
+
 
 function preload() {
   ImageZombie = loadImage('[removal.ai]_a2f6fc48-1e53-4dd7-9aac-f698a64786d5-zombzomb.png');
+  ImageZombieAlly = loadImage('zomb.png')
   ImageSurvivant = loadImage('[removal.ai]_44584a0c-ccce-47d6-b319-183254945aa8-image.png');
   ImageBOSS = loadImage('BruteLeft.webp');
+  ImageBoss2 = loadImage('Boss2.gif');
+  ImageBoss3 = loadImage('Boss3.gif');
 }
 
 function windowResized() {
@@ -31,6 +44,7 @@ function restartGame() {
   playerLives = 3;
   scorebarre = 0;
   zombies = [];
+  playerTeam = [];
   projectiles = [];
   loop();
   document.getElementById('game-over').style.display = 'none';
@@ -42,21 +56,19 @@ function draw() {
   player.display();
   player.move();
 
-  projectilethrow();
   zombielogical();
+
+  for (let i = 0; i < playerTeam.length; i++) {
+    playerTeam[i].attack(zombies);
+    playerTeam[i].display();
+  }
+  
+  handleZombieCombat();
+
+  projectilethrow();
   
   displayInfo();
-
-  if (scorebarre >= 1000) {
-    spawnBOSS();
-  }
 }
-
-function spawnBOSS() {
-  let boss = new BOSS(width, player.y, 100);
-  zombies.push(boss);
-}
-
 
 function projectilethrow() {
   for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -64,14 +76,50 @@ function projectilethrow() {
     projectiles[i].move();
     if (projectiles[i].x > width) {
       projectiles.splice(i, 1);
-    } else {
-      for (let j = zombies.length - 1; j >= 0; j--) {
-        if (projectiles[i] && projectiles[i].hits(zombies[j])) {
-          zombies.splice(j, 1);
-          projectiles.splice(i, 1);
+      continue;
+    }
+
+    for (let j = zombies.length - 1; j >= 0; j--) {
+      if (projectiles[i] && projectiles[i].hits(zombies[j])) {  // Assurez-vous que le projectile existe encore
+        if (j < zombies.length && zombies[j] && !zombies[j].isFriendly && Math.random() < conversiontozombieally) {
+          let posKey = null;
+          if (!placezombieally.front) {
+            posKey = 'front';
+          } else if (!placezombieally.top) {
+            posKey = 'top';
+          } else if (!placezombieally.bottom) {
+            posKey = 'bottom';
+          }
+
+          if (posKey) {
+            zombies[j].isFriendly = true;
+            switch (posKey) {
+              case 'front':
+                zombies[j].x = player.x + 50;
+                zombies[j].y = player.y;
+                break;
+              case 'top':
+                zombies[j].x = player.x + 50;
+                zombies[j].y = player.y - 60;
+                break;
+              case 'bottom':
+                zombies[j].x = player.x + 50;
+                zombies[j].y = player.y + 60;
+                break;
+            }
+            playerTeam.push(zombies[j]);
+            placezombieally[posKey] = zombies[j];
+            zombies.splice(j, 1);
+            console.log(`Zombie converted to ally at position ${posKey}.`);
+            scorebarre += 50;
+          }
+        } else if (zombies[j] && zombies[j].health <= 0) {  // Vérifiez également ici que le zombie existe
+          console.log(`Zombie killed at position ${j} with 0 health remaining.`);
           scorebarre += 50;
-          break;
+          zombies.splice(j, 1);
         }
+        projectiles.splice(i, 1);
+        break;
       }
     }
   }
@@ -79,25 +127,34 @@ function projectilethrow() {
 
 function zombielogical() {
   let currentTime = millis();
-  if (currentTime - lastSpawnTime > spawnDelay) {
-    zombies.push(new Zombie(width, player.y, 50));
+  let spawnInterval = random(1500, 2500);
+
+  if (currentTime - lastSpawnTime > spawnInterval) {
+    let numberOfZombies = floor(random(1, 4));
+    for (let i = 0; i < numberOfZombies; i++) {
+      let newZombie = new Zombie(width - i * 50, player.y, 50);
+      zombies.push(newZombie);
+      console.log(`New zombie spawned with ${newZombie.health} health at x=${newZombie.x}`);
+    }
     lastSpawnTime = currentTime;
   }
 
-  for (let i = zombies.length - 1; i >= 0; i--) {
-    zombies[i].display();
-    zombies[i].move();
-    if (zombies[i].hits(player)) {
+  zombies.forEach((zombie, index) => {
+    zombie.display();
+    zombie.move();
+    if (zombie.hits(player)) {
+      console.log(`Zombie hits player. Zombie health: ${zombie.health}`);
       playerLives--;
-      zombies.splice(i, 1);
+      zombies.splice(index, 1);
       if (playerLives <= 0) {
+        console.log("Game Over! Player lives are zero.");
         noLoop();
-        console.log("Game Over!");
-        document.getElementById('game-over').style.display = 'block'; // Affiche le message de fin de jeu
+        document.getElementById('game-over').style.display = 'block';
       }
     }
-  }
+  });
 }
+
 
 function displayInfo() {
   fill(0);
@@ -135,15 +192,19 @@ class Player {
 }
 
 class Zombie {
-  constructor(x, y, size) {
+  constructor(x, y, size, isFriendly = false) {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 10;
+    this.speed = 3;
   }
 
   display() {
-    image(ImageZombie, this.x, this.y, this.size, this.size);
+    if (this.isFriendly) {
+      image(ImageZombieAlly, this.x, this.y, this.size, this.size);
+    } else {
+      image(ImageZombie, this.x, this.y, this.size, this.size);
+    }
   }
 
   move() {
@@ -154,7 +215,26 @@ class Zombie {
     let d = dist(this.x, this.y, player.x, player.y);
     return d < this.size / 2 + player.size / 2;
   }
+
+  attack(zombies) {
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      if (this.isFriendly && !zombies[i].isFriendly) {
+        let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
+        if (d < 50) {
+          console.log(`Friendly zombie at (${this.x}, ${this.y}) attacks enemy zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
+          zombies[i].health -= this.damage;
+          if (zombies[i].health <= 0) {
+            console.log(`Enemy zombie at (${zombies[i].x}, ${zombies[i].y}) killed by friendly zombie.`);
+            zombies.splice(i, 1);
+            scorebarre += 50;
+            break;
+          }
+        }
+      }
+    }
+  }
 }
+
 
 class Projectile {
   constructor(x, y) {
@@ -179,12 +259,14 @@ class Projectile {
   }
 }
 
-class BOSS {
+class Boss {
   constructor(x, y, size) {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 2;
+    this.speed = 1;
+    this.damage = 10;
+    this.health = 100;
   }
 
   display() {
@@ -192,16 +274,16 @@ class BOSS {
   }
 
   move(player) {
-    if (this.x > player.x) {
-      this.x -= this.speed;
-    } else if (this.x < player.x) {
+    if (player.x > this.x) {
       this.x += this.speed;
+    } else if (player.x < this.x) {
+      this.x -= this.speed;
     }
 
-    if (this.y > player.y) {
-      this.y -= this.speed;
-    } else if (this.y < player.y) {
+    if (player.y > this.y) {
       this.y += this.speed;
+    } else if (player.y < this.y) {
+      this.y -= this.speed;
     }
   }
 
@@ -209,4 +291,172 @@ class BOSS {
     let d = dist(this.x, this.y, player.x, player.y);
     return d < this.size / 2 + player.size / 2;
   }
+
+  attack(zombies) {
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
+      if (d < 50) {
+        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
+        zombies[i].health -= this.damage;
+        if (zombies[i].health <= 0) {
+          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
+          zombies.splice(i, 1);
+          scorebarre += 50;
+          if (scorebarre >= 1000) {
+            spawnBoss();
+          }
+          break;
+        }
+      }
+    }
+  }
 }
+
+function checkScore() {
+  if (scorebarre >= 1000) {
+    spawnBoss();
+  }
+}
+
+function spawnBoss() {
+  let boss = new Boss(width - 100, height / 2, 100);
+  zombies.push(boss);
+  console.log("Boss spawned!");
+}
+
+class Boss2 {
+  constructor(x, y, size) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = 1;
+    this.damage = 10;
+    this.health = 100;
+  }
+
+  display() {
+    image(ImageBoss2, this.x, this.y, this.size, this.size);
+  }
+
+  move(player) {
+    if (player.x > this.x) {
+      this.x += this.speed;
+    } else if (player.x < this.x) {
+      this.x -= this.speed;
+    }
+
+    if (player.y > this.y) {
+      this.y += this.speed;
+    } else if (player.y < this.y) {
+      this.y -= this.speed;
+    }
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x, player.y);
+    return d < this.size / 2 + player.size / 2;
+  }
+
+  attack(zombies) {
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
+      if (d < 50) {
+        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
+        zombies[i].health -= this.damage;
+        if (zombies[i].health <= 0) {
+          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
+          zombies.splice(i, 1);
+          scorebarre += 50;
+          if (scorebarre >= 1500) {
+            spawnBoss2();
+          }
+          break;
+        }
+      }
+    }
+  }
+}
+
+function checkScore() {
+  if (scorebarre >= 1500) {
+    spawnBoss2();
+  }
+}
+
+function spawnBoss2() {
+  let boss2 = new Boss2(width - 100, height / 2, 100);
+  zombies.push(boss2);
+  console.log("Boss2 spawned!");
+}
+
+
+
+class Boss3 {
+  constructor(x, y, size) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = 1;
+    this.damage = 10;
+    this.health = 100;
+  }
+
+  display() {
+    image(ImageBoss3, this.x, this.y, this.size, this.size);
+  }
+
+  move(player) {
+    if (player.x > this.x) {
+      this.x += this.speed;
+    } else if (player.x < this.x) {
+      this.x -= this.speed;
+    }
+
+    if (player.y > this.y) {
+      this.y += this.speed;
+    } else if (player.y < this.y) {
+      this.y -= this.speed;
+    }
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x, player.y);
+    return d < this.size / 2 + player.size / 2;
+  }
+
+  attack(zombies) {
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
+      if (d < 50) {
+        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
+        zombies[i].health -= this.damage;
+        if (zombies[i].health <= 0) {
+          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
+          zombies.splice(i, 1);
+          scorebarre += 50;
+          if (scorebarre >= 2000) {
+            spawnBoss3();
+          }
+          break;
+        }
+      }
+    }
+  }
+}
+
+function checkScore() {
+  if (scorebarre >= 2000) {
+    spawnBoss3();
+  }
+}
+
+function spawnBoss3() {
+  let boss3 = new Boss3(width - 100, height / 2, 100);
+  zombies.push(boss3);
+  console.log("Boss3 spawned!");
+}
+
+
+
+
+
