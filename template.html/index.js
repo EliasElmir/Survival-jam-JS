@@ -23,9 +23,9 @@ let placezombieally = {
 
 
 function preload() {
-  ImageZombie = loadImage('[removal.ai]_a2f6fc48-1e53-4dd7-9aac-f698a64786d5-zombzomb.png');
+  ImageZombie = loadImage('zombie.png');
   ImageZombieAlly = loadImage('zomb.png')
-  ImageSurvivant = loadImage('[removal.ai]_44584a0c-ccce-47d6-b319-183254945aa8-image.png');
+  ImageSurvivant = loadImage('Survivant.png');
   ImageBOSS = loadImage('BruteLeft.webp');
   ImageBoss2 = loadImage('Boss2.gif');
   ImageBoss3 = loadImage('Boss3.gif');
