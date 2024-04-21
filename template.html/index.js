@@ -4,6 +4,7 @@ let playerLives = 3;
 let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
+let ImageBOSS;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
@@ -14,6 +15,7 @@ let spawnDelay = 1000;
 function preload() {
   ImageZombie = loadImage('[removal.ai]_a2f6fc48-1e53-4dd7-9aac-f698a64786d5-zombzomb.png');
   ImageSurvivant = loadImage('[removal.ai]_44584a0c-ccce-47d6-b319-183254945aa8-image.png');
+  ImageBOSS = loadImage('BruteLeft.webp');
 }
 
 function windowResized() {
@@ -44,7 +46,17 @@ function draw() {
   zombielogical();
   
   displayInfo();
+
+  if (scorebarre >= 1000) {
+    spawnBOSS();
+  }
 }
+
+function spawnBOSS() {
+  let boss = new BOSS(width, player.y, 100);
+  zombies.push(boss);
+}
+
 
 function projectilethrow() {
   for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -127,7 +139,7 @@ class Zombie {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 3;
+    this.speed = 10;
   }
 
   display() {
@@ -164,5 +176,37 @@ class Projectile {
   hits(zombie) {
     let d = dist(this.x, this.y, zombie.x, zombie.y);
     return d < this.size / 2 + zombie.size / 2;
+  }
+}
+
+class BOSS {
+  constructor(x, y, size) {
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.speed = 2;
+  }
+
+  display() {
+    image(ImageBOSS, this.x, this.y, this.size, this.size);
+  }
+
+  move(player) {
+    if (this.x > player.x) {
+      this.x -= this.speed;
+    } else if (this.x < player.x) {
+      this.x += this.speed;
+    }
+
+    if (this.y > player.y) {
+      this.y -= this.speed;
+    } else if (this.y < player.y) {
+      this.y += this.speed;
+    }
+  }
+
+  hits(player) {
+    let d = dist(this.x, this.y, player.x, player.y);
+    return d < this.size / 2 + player.size / 2;
   }
 }
