@@ -20,6 +20,7 @@ let placezombieally = {
   top: null,
   bottom: null
 };
+let gameLevel = 1;
 
 
 function preload() {
@@ -62,12 +63,43 @@ function draw() {
     playerTeam[i].attack(zombies);
     playerTeam[i].display();
   }
-  
+
   handleZombieCombat();
 
   projectilethrow();
-  
+
   displayInfo();
+  
+  checkScore();
+}
+
+function handleZombieCombat() {
+  for (let i = zombies.length - 1; i >= 0; i--) {
+    for (let j = playerTeam.length - 1; j >= 0; j--) {
+      let d = dist(zombies[i].x, zombies[i].y, playerTeam[j].x, playerTeam[j].y);
+      if (d < 50) {
+        playerTeam[j].health -= zombies[i].damage;
+        zombies[i].health -= playerTeam[j].damage;
+
+        if (zombies[i].health <= 0) {
+          zombies.splice(i, 1);
+          scorebarre += 50;
+          continue;
+        }
+
+        if (playerTeam[j].health <= 0) {
+          for (const [key, zombie] of Object.entries(placezombieally)) {
+            if (zombie === playerTeam[j]) {
+              placezombieally[key] = null;
+              break;
+            }
+          }
+          playerTeam.splice(j, 1);
+        }
+      }
+    }
+    if (zombies.length == 0) break;
+  }
 }
 
 function projectilethrow() {
@@ -80,7 +112,7 @@ function projectilethrow() {
     }
 
     for (let j = zombies.length - 1; j >= 0; j--) {
-      if (projectiles[i] && projectiles[i].hits(zombies[j])) {  // Assurez-vous que le projectile existe encore
+      if (projectiles[i] && projectiles[i].hits(zombies[j])) {
         if (j < zombies.length && zombies[j] && !zombies[j].isFriendly && Math.random() < conversiontozombieally) {
           let posKey = null;
           if (!placezombieally.front) {
@@ -113,7 +145,7 @@ function projectilethrow() {
             console.log(`Zombie converted to ally at position ${posKey}.`);
             scorebarre += 50;
           }
-        } else if (zombies[j] && zombies[j].health <= 0) {  // Vérifiez également ici que le zombie existe
+        } else if (zombies[j] && zombies[j].health <= 0) { 
           console.log(`Zombie killed at position ${j} with 0 health remaining.`);
           scorebarre += 50;
           zombies.splice(j, 1);
@@ -126,13 +158,15 @@ function projectilethrow() {
 }
 
 function zombielogical() {
+  updateGameLevel();
   let currentTime = millis();
-  let spawnInterval = random(1500, 2500);
+  let spawnInterval = random(spawnDelay - 200, spawnDelay + 500);
 
   if (currentTime - lastSpawnTime > spawnInterval) {
     let numberOfZombies = floor(random(1, 4));
     for (let i = 0; i < numberOfZombies; i++) {
-      let newZombie = new Zombie(width - i * 50, player.y, 50);
+      let zombieSpeed = gameLevel === 2 ? 4 : 3;
+      let newZombie = new Zombie(width - i * 50, player.y, 50, false, zombieSpeed);
       zombies.push(newZombie);
       console.log(`New zombie spawned with ${newZombie.health} health at x=${newZombie.x}`);
     }
@@ -197,6 +231,10 @@ class Zombie {
     this.y = y;
     this.size = size;
     this.speed = 3;
+    this.isFriendly = isFriendly;
+    this.health = this.isFriendly ? 150 : 100;
+    this.damage = this.isFriendly ? 25 : 10;
+    console.log(`Creating ${this.isFriendly ? "friendly" : "enemy"} zombie with ${this.health} health.`);
   }
 
   display() {
@@ -235,7 +273,6 @@ class Zombie {
   }
 }
 
-
 class Projectile {
   constructor(x, y) {
     this.x = x;
@@ -255,7 +292,40 @@ class Projectile {
 
   hits(zombie) {
     let d = dist(this.x, this.y, zombie.x, zombie.y);
-    return d < this.size / 2 + zombie.size / 2;
+    if (d < this.size / 2 + zombie.size / 2 && !zombie.isFriendly) {
+      zombie.health -= 100;
+      console.log(`Projectile inflicts 100 damage on zombie. Zombie health now ${zombie.health}.`);
+      if (zombie.health <= 0) {
+        console.log(`Zombie at position ${zombies.indexOf(zombie)} killed.`);
+        zombies.splice(zombies.indexOf(zombie), 1); 
+        scorebarre += 50;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+function updateGameLevel() {
+  if (scorebarre >= 1300 && gameLevel === 1) {
+    gameLevel = 2;
+    updateGameDifficulty();
+    console.log("Level 2 has started! Difficulty increased.");
+  }
+}
+
+function updateGameDifficulty() {
+  switch (gameLevel) {
+    case 2:
+      spawnDelay = 800;
+      projectiledelay = 0.3;
+      conversiontozombieally = 0.4;
+      break;
+    default:
+      spawnDelay = 1000;
+      projectiledelay = 0.4;
+      conversiontozombieally = 0.5;
+      break;
   }
 }
 
