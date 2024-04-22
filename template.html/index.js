@@ -21,6 +21,7 @@ let placezombieally = {
   bottom: null
 };
 let gameLevel = 1;
+let gameInitialized = false;
 
 
 function preload() {
@@ -39,6 +40,14 @@ function windowResized() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   player = new Player(20, height - 373, 50);
+  noLoop();
+}
+
+function PlayGame() {
+  if (!gameInitialized) {
+      gameInitialized = true;
+      loop();
+  }
 }
 
 function restartGame() {
