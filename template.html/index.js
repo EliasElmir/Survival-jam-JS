@@ -80,6 +80,7 @@ function draw() {
 
   for (let i = 0; i < playerTeam.length; i++) {
     playerTeam[i].attack(zombies);
+    playerTeam[i].moveTowardsEnemy(zombies);
     playerTeam[i].display();
   }
   handleZombieCombat();
@@ -265,6 +266,28 @@ class Zombie {
   }
   move() {
     this.x -= this.speed;
+  }
+  moveTowardsEnemy(enemies) {
+    if (this.isFriendly && enemies.length > 0) {
+      let closestEnemy = enemies[0];
+      let closestDist = dist(this.x, this.y, enemies[0].x, enemies[0].y);
+
+      for (let i = 1; i < enemies.length; i++) {
+        let d = dist(this.x, this.y, enemies[i].x, enemies[i].y);
+        if (d < closestDist) {
+          closestEnemy = enemies[i];
+          closestDist = d;
+        }
+      }
+
+      let dir = p5.Vector.sub(closestEnemy.createVector(), this.createVector()).normalize();
+      this.x += dir.x * this.speed;
+      this.y += dir.y * this.speed;
+    }
+  }
+
+  createVector() {
+    return createVector(this.x, this.y);
   }
   hits(player) {
     let d = dist(this.x, this.y, player.x, player.y);
