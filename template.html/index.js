@@ -56,8 +56,8 @@ function restartGame() {
   zombies = [];
   playerTeam = [];
   projectiles = [];
-  loop();
   document.getElementById('game-over').style.display = 'none';
+  loop();
 }
 
 function draw() {
@@ -300,8 +300,11 @@ class Projectile {
   }
 
   hits(zombie) {
-    let d = dist(this.x, this.y, zombie.x, zombie.y);
-    if (d < this.size / 2 + zombie.size / 2 && !zombie.isFriendly) {
+    let zombieWidth = zombie.size;
+    let zombieHeight = zombie.size;
+    let hit = this.x + this.size / 2 > zombie.x && this.x - this.size / 2 < zombie.x + zombieWidth &&
+              this.y + this.size / 2 > zombie.y && this.y - this.size / 2 < zombie.y + zombieHeight;
+    if (hit && !zombie.isFriendly) {
       zombie.health -= 100;
       console.log(`Projectile inflicts 100 damage on zombie. Zombie health now ${zombie.health}.`);
       if (zombie.health <= 0) {
