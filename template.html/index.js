@@ -20,7 +20,7 @@ let placezombieally = {
   top: null,
   bottom: null
 };
-const orderzombieally = {
+const offsets = {
   front: { x: 50, y: 0 },
   top: { x: 50, y: -60 },
   bottom: { x: 50, y: 60 }
@@ -209,8 +209,8 @@ function zombielogical() {
 function updateAllyPositions() {
   Object.entries(placezombieally).forEach(([key, zombie]) => {
       if (zombie) {
-          zombie.x = player.x + orderzombieally[key].x;
-          zombie.y = player.y + orderzombieally[key].y;
+          zombie.x = player.x + offsets[key].x;
+          zombie.y = player.y + offsets[key].y;
       }
   });
 }
