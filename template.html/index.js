@@ -1,4 +1,9 @@
 let player;
+let boss1spawn = false;
+let boss2spawn = false;
+let boss3spawn = false;
+let boss3dead = false;
+let boss3;
 let zombies = [];
 let playerLives = 3;
 let scorebarre = 0;
@@ -34,9 +39,9 @@ function preload() {
   ImageZombie = loadImage('zombie.png');
   ImageZombieAlly = loadImage('zomb.png')
   ImageSurvivant = loadImage('Survivant.png');
-  ImageBOSS = loadImage('BruteLeft.webp');
-  ImageBoss2 = loadImage('Boss2.gif');
-  ImageBoss3 = loadImage('Boss3.gif');
+  ImageBOSS = loadImage('Boss2.png');
+  ImageBoss2 = loadImage('Boss3.png ');
+  ImageBoss3 = loadImage('Boss1.png');
 }
 
 function windowResized() {
@@ -62,17 +67,18 @@ function restartGame() {
   zombies = [];
   playerTeam = [];
   projectiles = [];
-  document.getElementById('game-over').style.display = 'none';
   loop();
+  document.getElementById('game-over').style.display = 'none';
 }
 
 function draw() {
   background(220);
+
   
   player.display();
   player.move();
-
   updateAllyPositions();
+
 
   zombielogical();
 
@@ -86,8 +92,7 @@ function draw() {
   projectilethrow();
 
   displayInfo();
-  
-  checkScore();
+
 }
 
 function handleZombieCombat() {
@@ -159,11 +164,9 @@ function projectilethrow() {
             playerTeam.push(zombies[j]);
             placezombieally[posKey] = zombies[j];
             zombies.splice(j, 1);
-            console.log(`Zombie converted to ally at position ${posKey}.`);
             scorebarre += 50;
           }
         } else if (zombies[j] && zombies[j].health <= 0) { 
-          console.log(`Zombie killed at position ${j} with 0 health remaining.`);
           scorebarre += 50;
           zombies.splice(j, 1);
         }
@@ -185,7 +188,6 @@ function zombielogical() {
       let zombieSpeed = gameLevel === 2 ? 4 : 3;
       let newZombie = new Zombie(width - i * 50, player.y, 50, false, zombieSpeed);
       zombies.push(newZombie);
-      console.log(`New zombie spawned with ${newZombie.health} health at x=${newZombie.x}`);
     }
     lastSpawnTime = currentTime;
   }
@@ -194,16 +196,32 @@ function zombielogical() {
     zombie.display();
     zombie.move();
     if (zombie.hits(player)) {
-      console.log(`Zombie hits player. Zombie health: ${zombie.health}`);
       playerLives--;
       zombies.splice(index, 1);
       if (playerLives <= 0) {
-        console.log("Game Over! Player lives are zero.");
         noLoop();
         document.getElementById('game-over').style.display = 'block';
       }
     }
   });
+
+  if (boss1spawn === false) {
+    checkScore();
+  }
+
+  if (boss2spawn === false) {
+    checkScore2();
+  }
+
+  if (boss3spawn === false) {
+    checkScore3();
+  } else {
+    if(boss3dead===true) {
+      console.log("bossdead")
+      noLoop();
+    }
+  }
+
 }
 
 function updateAllyPositions() {
@@ -255,11 +273,10 @@ class Zombie {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 3;
+    this.speed = 5;
     this.isFriendly = isFriendly;
     this.health = this.isFriendly ? 150 : 100;
     this.damage = this.isFriendly ? 25 : 10;
-    console.log(`Creating ${this.isFriendly ? "friendly" : "enemy"} zombie with ${this.health} health.`);
   }
 
   display() {
@@ -284,10 +301,8 @@ class Zombie {
       if (this.isFriendly && !zombies[i].isFriendly) {
         let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
         if (d < 50) {
-          console.log(`Friendly zombie at (${this.x}, ${this.y}) attacks enemy zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
           zombies[i].health -= this.damage;
           if (zombies[i].health <= 0) {
-            console.log(`Enemy zombie at (${zombies[i].x}, ${zombies[i].y}) killed by friendly zombie.`);
             zombies.splice(i, 1);
             scorebarre += 50;
             break;
@@ -316,17 +331,16 @@ class Projectile {
   }
 
   hits(zombie) {
-    let zombieWidth = zombie.size;
-    let zombieHeight = zombie.size;
-    let hit = this.x + this.size / 2 > zombie.x && this.x - this.size / 2 < zombie.x + zombieWidth &&
-              this.y + this.size / 2 > zombie.y && this.y - this.size / 2 < zombie.y + zombieHeight;
-    if (hit && !zombie.isFriendly) {
+    let d = dist(this.x, this.y, zombie.x, zombie.y);
+    if (d < this.size / 2 + zombie.size / 2 && !zombie.isFriendly) {
       zombie.health -= 100;
-      console.log(`Projectile inflicts 100 damage on zombie. Zombie health now ${zombie.health}.`);
       if (zombie.health <= 0) {
-        console.log(`Zombie at position ${zombies.indexOf(zombie)} killed.`);
+        console.log(zombie)
         zombies.splice(zombies.indexOf(zombie), 1); 
         scorebarre += 50;
+        if (zombie.isBoss) {
+          boss3dead = true
+        }
         return true;
       }
     }
@@ -338,7 +352,6 @@ function updateGameLevel() {
   if (scorebarre >= 1300 && gameLevel === 1) {
     gameLevel = 2;
     updateGameDifficulty();
-    console.log("Level 2 has started! Difficulty increased.");
   }
 }
 
@@ -362,7 +375,7 @@ class Boss {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 1;
+    this.speed = 3;
     this.damage = 10;
     this.health = 100;
   }
@@ -371,18 +384,9 @@ class Boss {
     image(ImageBOSS, this.x, this.y, this.size, this.size);
   }
 
-  move(player) {
-    if (player.x > this.x) {
-      this.x += this.speed;
-    } else if (player.x < this.x) {
-      this.x -= this.speed;
-    }
+  move() {
+        this.x -= this.speed;
 
-    if (player.y > this.y) {
-      this.y += this.speed;
-    } else if (player.y < this.y) {
-      this.y -= this.speed;
-    }
   }
 
   hits(player) {
@@ -394,15 +398,10 @@ class Boss {
     for (let i = zombies.length - 1; i >= 0; i--) {
       let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
       if (d < 50) {
-        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
         zombies[i].health -= this.damage;
         if (zombies[i].health <= 0) {
-          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
           zombies.splice(i, 1);
           scorebarre += 50;
-          if (scorebarre >= 1000) {
-            spawnBoss();
-          }
           break;
         }
       }
@@ -413,13 +412,13 @@ class Boss {
 function checkScore() {
   if (scorebarre >= 1000) {
     spawnBoss();
+    boss1spawn = true;
   }
 }
 
 function spawnBoss() {
-  let boss = new Boss(width - 100, height / 2, 100);
-  zombies.push(boss);
-  console.log("Boss spawned!");
+    boss1 = new Boss(width - 100, height / 2, 100);
+    zombies.push(boss1);
 }
 
 class Boss2 {
@@ -427,7 +426,7 @@ class Boss2 {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 1;
+    this.speed = 3;
     this.damage = 10;
     this.health = 100;
   }
@@ -436,18 +435,9 @@ class Boss2 {
     image(ImageBoss2, this.x, this.y, this.size, this.size);
   }
 
-  move(player) {
-    if (player.x > this.x) {
-      this.x += this.speed;
-    } else if (player.x < this.x) {
-      this.x -= this.speed;
-    }
+  move() {
+        this.x -= this.speed;
 
-    if (player.y > this.y) {
-      this.y += this.speed;
-    } else if (player.y < this.y) {
-      this.y -= this.speed;
-    }
   }
 
   hits(player) {
@@ -459,15 +449,10 @@ class Boss2 {
     for (let i = zombies.length - 1; i >= 0; i--) {
       let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
       if (d < 50) {
-        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
         zombies[i].health -= this.damage;
         if (zombies[i].health <= 0) {
-          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
           zombies.splice(i, 1);
           scorebarre += 50;
-          if (scorebarre >= 1500) {
-            spawnBoss2();
-          }
           break;
         }
       }
@@ -475,46 +460,35 @@ class Boss2 {
   }
 }
 
-function checkScore() {
+function checkScore2() {
   if (scorebarre >= 1500) {
     spawnBoss2();
+    boss2spawn = true
   }
 }
 
 function spawnBoss2() {
-  let boss2 = new Boss2(width - 100, height / 2, 100);
+  boss2 = new Boss2(width - 100, height / 2, 100);
   zombies.push(boss2);
-  console.log("Boss2 spawned!");
 }
-
-
 
 class Boss3 {
   constructor(x, y, size) {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 1;
+    this.speed = 3;
     this.damage = 10;
     this.health = 100;
+    this.isBoss = true;
   }
 
   display() {
     image(ImageBoss3, this.x, this.y, this.size, this.size);
   }
 
-  move(player) {
-    if (player.x > this.x) {
-      this.x += this.speed;
-    } else if (player.x < this.x) {
-      this.x -= this.speed;
-    }
-
-    if (player.y > this.y) {
-      this.y += this.speed;
-    } else if (player.y < this.y) {
-      this.y -= this.speed;
-    }
+  move() {
+        this.x -= this.speed;
   }
 
   hits(player) {
@@ -526,15 +500,10 @@ class Boss3 {
     for (let i = zombies.length - 1; i >= 0; i--) {
       let d = dist(this.x, this.y, zombies[i].x, zombies[i].y);
       if (d < 50) {
-        console.log(`Boss at (${this.x}, ${this.y}) attacks zombie at (${zombies[i].x}, ${zombies[i].y}) with ${this.damage} damage.`);
         zombies[i].health -= this.damage;
         if (zombies[i].health <= 0) {
-          console.log(`Zombie at (${zombies[i].x}, ${zombies[i].y}) killed by boss.`);
           zombies.splice(i, 1);
           scorebarre += 50;
-          if (scorebarre >= 2000) {
-            spawnBoss3();
-          }
           break;
         }
       }
@@ -542,7 +511,7 @@ class Boss3 {
   }
 }
 
-function checkScore() {
+function checkScore3() {
   if (scorebarre >= 2000) {
     spawnBoss3();
   }
@@ -550,11 +519,7 @@ function checkScore() {
 
 function spawnBoss3() {
   let boss3 = new Boss3(width - 100, height / 2, 100);
+  console.log("boss3 spawned")
   zombies.push(boss3);
-  console.log("Boss3 spawned!");
+  boss3spawn = true;
 }
-
-
-
-
-
