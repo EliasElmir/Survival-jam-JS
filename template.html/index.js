@@ -25,6 +25,12 @@ let placezombieally = {
   top: null,
   bottom: null
 };
+const orderzombieally = {
+  front: { x: 50, y: 0 },
+  top: { x: 50, y: -60 },
+  bottom: { x: 50, y: 60 }
+};
+
 let gameLevel = 1;
 let gameInitialized = false;
 
@@ -67,9 +73,12 @@ function restartGame() {
 
 function draw() {
   background(220);
+
   
   player.display();
   player.move();
+  updateAllyPositions();
+
 
   zombielogical();
 
@@ -213,6 +222,15 @@ function zombielogical() {
     }
   }
 
+}
+
+function updateAllyPositions() {
+  Object.entries(placezombieally).forEach(([key, zombie]) => {
+      if (zombie) {
+          zombie.x = player.x + orderzombieally[key].x;
+          zombie.y = player.y + orderzombieally[key].y;
+      }
+  });
 }
 
 function displayInfo() {
