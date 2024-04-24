@@ -70,7 +70,7 @@ function restartGame() {
 }
 
 function draw() {
-  background(220);
+  background(51);
 
   player.display();
   player.move();
