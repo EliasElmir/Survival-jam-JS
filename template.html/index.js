@@ -255,7 +255,7 @@ class Player {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 5;
+    this.speed = 8;
   }
   // In this "Player" class we initialize the player properties. 
   // We initialize its position, its size, its speed, with specific default values.
@@ -291,7 +291,7 @@ class Zombie {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = speed;
+    this.speed = this.isFriendly ? 10 : speed;
     this.isFriendly = isFriendly;
     this.health = this.isFriendly ? 150 : 100;
     this.damage = this.isFriendly ? 25 : 10;
@@ -337,8 +337,8 @@ class Zombie {
       // If the new distance is closer closetDist is updated.
 
       let dir = p5.Vector.sub(closestEnemy.createVector(), this.createVector()).normalize();
-      this.x += dir.x * this.speed;
-      this.y += dir.y * this.speed;
+      this.x += dir.x * 5;
+      this.y += dir.y * 5;
     }
   }
   // In this part of the method, we calculate a directional vector between the current object and the closest enemy, then use this vector to move the object towards the enemy with a specific speed.
