@@ -176,7 +176,8 @@ function zombielogical() {
   if (currentTime - lastSpawnTime > spawnInterval) {
     let numberOfZombies = floor(random(1, maxzombiespawn + 1));
     for (let i = 0; i < numberOfZombies; i++) {
-      let newZombie = new Zombie(width - i * 50, max(0, random(height)), 50, false, zombieSpeed);
+      // Ajoutez une certaine valeur à 'width' pour faire apparaître les zombies à l'extérieur du canvas
+      let newZombie = new Zombie(width + i * 50, max(0, random(height)), 50, false, zombieSpeed);
       zombies.push(newZombie);
     }
     lastSpawnTime = currentTime;
