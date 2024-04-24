@@ -229,10 +229,10 @@ function zombielogical() {
       playerLives--;
       zombies.splice(index, 1);
     }
-    //if (zombie.x < 0) {
-      //playerLives--;
-      //zombies.splice(index, 1);
-    //}
+    if (zombie.x < 0) {
+      playerLives--;
+      zombies.splice(index, 1);
+    }
     if (playerLives <= 0) {
       noLoop();
       document.getElementById('game-over').style.display = 'block';
