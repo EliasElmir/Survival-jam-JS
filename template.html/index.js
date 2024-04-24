@@ -1,17 +1,9 @@
 let player;
-let boss1spawn = false;
-let boss2spawn = false;
-let boss3spawn = false;
-let boss3dead = false;
-let boss3;
 let zombies = [];
 let playerLives = 3;
 let scorebarre = 0;
 let ImageZombie;
 let ImageSurvivant;
-let ImageBOSS;
-let ImageBoss2;
-let ImageBoss3;
 let projectiles = []; 
 let authorizetoshoot = true;
 let lastprojectiles = 0;
@@ -39,9 +31,6 @@ function preload() {
   ImageZombie = loadImage('zombie.png');
   ImageZombieAlly = loadImage('zomb.png')
   ImageSurvivant = loadImage('Survivant.png');
-  ImageBOSS = loadImage('Boss2.png');
-  ImageBoss2 = loadImage('Boss3.png ');
-  ImageBoss3 = loadImage('Boss1.png');
 }
 
 function windowResized() {
@@ -203,25 +192,7 @@ function zombielogical() {
         document.getElementById('game-over').style.display = 'block';
       }
     }
-  });
-
-  if (boss1spawn === false) {
-    checkScore();
-  }
-
-  if (boss2spawn === false) {
-    checkScore2();
-  }
-
-  if (boss3spawn === false) {
-    checkScore3();
-  } else {
-    if(boss3dead===true) {
-      console.log("bossdead")
-      noLoop();
-    }
-  }
-
+  })
 }
 
 function updateAllyPositions() {
