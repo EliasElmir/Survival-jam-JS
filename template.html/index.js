@@ -12,6 +12,8 @@ let lastSpawnTime = 0;
 let spawnDelay = 1000;
 let playerTeam = [];
 let conversiontozombieally = 0.5;
+let maxzombiespawn = 3;
+let zombieSpeed = 2;
 let placezombieally = {
   front: null,
   top: null,
@@ -22,9 +24,8 @@ const orderzombieally = {
   top: { x: 50, y: -60 },
   bottom: { x: 50, y: 60 }
 };
-
-let gameLevel = 1;
 let gameInitialized = false;
+let gameLevel = 1;
 
 
 function preload() {
@@ -61,18 +62,20 @@ function restartGame() {
 }
 
 function draw() {
-  background(220);
+  background(51);
 
-  
   player.display();
   player.move();
+
   updateAllyPositions();
 
+  updateGameLevel();
 
   zombielogical();
 
   for (let i = 0; i < playerTeam.length; i++) {
     playerTeam[i].attack(zombies);
+    playerTeam[i].moveTowardsEnemy(zombies);
     playerTeam[i].display();
   }
 
@@ -91,7 +94,6 @@ function handleZombieCombat() {
       if (d < 50) {
         playerTeam[j].health -= zombies[i].damage;
         zombies[i].health -= playerTeam[j].damage;
-
         if (zombies[i].health <= 0) {
           zombies.splice(i, 1);
           scorebarre += 50;
@@ -155,7 +157,7 @@ function projectilethrow() {
             zombies.splice(j, 1);
             scorebarre += 50;
           }
-        } else if (zombies[j] && zombies[j].health <= 0) { 
+        } else if (zombies[j] && zombies[j].health <= 0) {
           scorebarre += 50;
           zombies.splice(j, 1);
         }
@@ -168,19 +170,17 @@ function projectilethrow() {
 
 function zombielogical() {
   updateGameLevel();
+  updateGameDifficulty();
   let currentTime = millis();
   let spawnInterval = random(spawnDelay - 200, spawnDelay + 500);
-
   if (currentTime - lastSpawnTime > spawnInterval) {
-    let numberOfZombies = floor(random(1, 4));
+    let numberOfZombies = floor(random(1, maxzombiespawn + 1));
     for (let i = 0; i < numberOfZombies; i++) {
-      let zombieSpeed = gameLevel === 2 ? 4 : 3;
       let newZombie = new Zombie(width - i * 50, player.y, 50, false, zombieSpeed);
       zombies.push(newZombie);
     }
     lastSpawnTime = currentTime;
   }
-
   zombies.forEach((zombie, index) => {
     zombie.display();
     zombie.move();
@@ -192,7 +192,7 @@ function zombielogical() {
         document.getElementById('game-over').style.display = 'block';
       }
     }
-  })
+  });
 }
 
 function updateAllyPositions() {
@@ -222,7 +222,7 @@ class Player {
   display() {
     image(ImageSurvivant, this.x, this.y, this.size, this.size);
   }
-
+  
   move() {
     if (keyIsDown(LEFT_ARROW)) this.x -= this.speed;
     if (keyIsDown(RIGHT_ARROW)) this.x += this.speed;
@@ -240,11 +240,11 @@ class Player {
 }
 
 class Zombie {
-  constructor(x, y, size, isFriendly = false) {
+  constructor(x, y, size, isFriendly = false, speed = 2) {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.speed = 5;
+    this.speed = speed;
     this.isFriendly = isFriendly;
     this.health = this.isFriendly ? 150 : 100;
     this.damage = this.isFriendly ? 25 : 10;
@@ -260,6 +260,29 @@ class Zombie {
 
   move() {
     this.x -= this.speed;
+  }
+
+  moveTowardsEnemy(enemies) {
+    if (this.isFriendly && enemies.length > 0) {
+      let closestEnemy = enemies[0];
+      let closestDist = dist(this.x, this.y, enemies[0].x, enemies[0].y);
+
+      for (let i = 1; i < enemies.length; i++) {
+        let d = dist(this.x, this.y, enemies[i].x, enemies[i].y);
+        if (d < closestDist) {
+          closestEnemy = enemies[i];
+          closestDist = d;
+        }
+      }
+
+      let dir = p5.Vector.sub(closestEnemy.createVector(), this.createVector()).normalize();
+      this.x += dir.x * this.speed;
+      this.y += dir.y * this.speed;
+    }
+  }
+
+  createVector() {
+    return createVector(this.x, this.y);
   }
 
   hits(player) {
@@ -302,15 +325,27 @@ class Projectile {
   }
 
   hits(zombie) {
-    let d = dist(this.x, this.y, zombie.x, zombie.y);
-    if (d < this.size / 2 + zombie.size / 2 && !zombie.isFriendly) {
+    let zombieLeft = zombie.x;
+    let zombieRight = zombie.x + zombie.size;
+    let zombieTop = zombie.y;
+    let zombieBottom = zombie.y + zombie.size;
+
+    let projectileLeft = this.x - this.size / 2;
+    let projectileRight = this.x + this.size / 2;
+    let projectileTop = this.y - this.size / 2;
+    let projectileBottom = this.y + this.size / 2;
+
+    if (projectileRight > zombieLeft &&
+        projectileLeft < zombieRight &&
+        projectileBottom > zombieTop &&
+        projectileTop < zombieBottom) {
       zombie.health -= 100;
       if (zombie.health <= 0) {
-        console.log(zombie)
-        zombies.splice(zombies.indexOf(zombie), 1); 
+        console.log(zombie);
+        zombies.splice(zombies.indexOf(zombie), 1);
         scorebarre += 50;
         if (zombie.isBoss) {
-          boss3dead = true
+          boss3dead = true;
         }
         return true;
       }
@@ -320,23 +355,51 @@ class Projectile {
 }
 
 function updateGameLevel() {
-  if (scorebarre >= 1300 && gameLevel === 1) {
-    gameLevel = 2;
+  let nextLevelScore = gameLevel * 1000;
+  if (scorebarre >= nextLevelScore && gameLevel < 5) {
+    gameLevel++;
     updateGameDifficulty();
   }
 }
 
 function updateGameDifficulty() {
+  console.log("Updating game difficulty settings for level:", gameLevel);
   switch (gameLevel) {
-    case 2:
-      spawnDelay = 800;
-      projectiledelay = 0.3;
-      conversiontozombieally = 0.4;
-      break;
-    default:
+    case 1:
       spawnDelay = 1000;
-      projectiledelay = 0.4;
+      projectiledelay = 0.3;
       conversiontozombieally = 0.5;
+      zombieSpeed = 2;
+      maxZombiesPerSpawn = 3;
+      break;
+    case 2:
+      spawnDelay = 850;
+      projectiledelay = 0.25;
+      conversiontozombieally = 0.45;
+      zombieSpeed = 2.5;
+      maxZombiesPerSpawn = 5;
+      break;
+    case 3:
+      spawnDelay = 700;
+      projectiledelay = 0.2;
+      conversiontozombieally = 0.4;
+      zombieSpeed = 3;
+      maxZombiesPerSpawn = 6;
+      break;
+    case 4:
+      spawnDelay = 550;
+      projectiledelay = 0.15;
+      conversiontozombieally = 0.35;
+      zombieSpeed = 3.5;
+      maxZombiesPerSpawn = 7;
+      break;
+    case 5:
+      spawnDelay = 400;
+      projectiledelay = 0.1;
+      conversiontozombieally = 0.3;
+      zombieSpeed = 4;
+      maxZombiesPerSpawn = 8;
       break;
   }
+  console.log("Settings updated: spawnDelay", spawnDelay, "projectiledelay", projectiledelay, "conversiontozombieally", conversiontozombieally, "zombieSpeed", zombieSpeed, "maxZombiesPerSpawn", maxZombiesPerSpawn);
 }
