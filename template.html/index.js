@@ -74,27 +74,14 @@ function draw() {
   player.display();
   player.move();
 
-  
-
   updateGameLevel();
 
   zombielogical();
 
-  for (let i = playerTeam.length - 1; i >= 0; i--) {
+  for (let i = 0; i < playerTeam.length; i++) {
     playerTeam[i].attack(zombies);
     playerTeam[i].moveTowardsEnemy(zombies);
     playerTeam[i].display();
-    playerTeam[i].move();
-    
-    if (playerTeam[i].outOfBounds) {
-      for (const [key, ally] of Object.entries(placezombieally)) {
-        if (ally === playerTeam[i]) {
-          placezombieally[key] = null;
-          break;
-        }
-      }
-      playerTeam.splice(i, 1);
-    }
   }
 
   handleZombieCombat();
@@ -213,15 +200,14 @@ function projectilethrow() {
 // The projectile is then removed.
 
 function zombielogical() {
-  if (frameCount % 60 === 0) {
-    updateGameLevel();
-  }
+  updateGameLevel();
+  updateGameDifficulty();
   let currentTime = millis();
   let spawnInterval = random(spawnDelay - 200, spawnDelay + 500);
   if (currentTime - lastSpawnTime > spawnInterval) {
     let numberOfZombies = floor(random(1, maxzombiespawn + 1));
     for (let i = 0; i < numberOfZombies; i++) {
-      let newZombie = new Zombie(width + i * 50, max(0, random(height)), 50, false, zombieSpeed);
+      let newZombie = new Zombie(width - i * 50, max(0, random(height)), 50, false, zombieSpeed);
       zombies.push(newZombie);
     }
     lastSpawnTime = currentTime;
