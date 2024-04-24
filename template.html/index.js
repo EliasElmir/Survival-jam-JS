@@ -80,10 +80,21 @@ function draw() {
 
   zombielogical();
 
-  for (let i = 0; i < playerTeam.length; i++) {
+  for (let i = playerTeam.length - 1; i >= 0; i--) {
     playerTeam[i].attack(zombies);
     playerTeam[i].moveTowardsEnemy(zombies);
     playerTeam[i].display();
+    playerTeam[i].move();
+    
+    if (playerTeam[i].outOfBounds) {
+      for (const [key, ally] of Object.entries(placezombieally)) {
+        if (ally === playerTeam[i]) {
+          placezombieally[key] = null;
+          break;
+        }
+      }
+      playerTeam.splice(i, 1);
+    }
   }
 
   handleZombieCombat();
@@ -287,6 +298,7 @@ class Zombie {
     this.isFriendly = isFriendly;
     this.health = this.isFriendly ? 150 : 100;
     this.damage = this.isFriendly ? 25 : 10;
+    this.outOfBounds = false;
   }
   // In this "Zombie" class we initialize the properties of the zombies. 
   // We initialize its position, size, speed, health and damage, with specific default values for allied and enemy zombies.
@@ -303,6 +315,9 @@ class Zombie {
 
   move() {
     this.x -= this.speed;
+    if (this.x < -this.size || this.x > windowWidth + this.size) {
+      this.outOfBounds = true;
+    }
   }
   // This method is used for objects that have it. 
   // It handles the fact that objects move to the left at a specific speed.
