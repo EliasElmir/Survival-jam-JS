@@ -176,7 +176,6 @@ function zombielogical() {
   if (currentTime - lastSpawnTime > spawnInterval) {
     let numberOfZombies = floor(random(1, maxzombiespawn + 1));
     for (let i = 0; i < numberOfZombies; i++) {
-      // Ajoutez une certaine valeur à 'width' pour faire apparaître les zombies à l'extérieur du canvas
       let newZombie = new Zombie(width + i * 50, max(0, random(height)), 50, false, zombieSpeed);
       zombies.push(newZombie);
     }
@@ -188,10 +187,15 @@ function zombielogical() {
     if (zombie.hits(player)) {
       playerLives--;
       zombies.splice(index, 1);
-      if (playerLives <= 0) {
-        noLoop();
-        document.getElementById('game-over').style.display = 'block';
-      }
+    }
+    // Vérifiez si le zombie est sorti du canvas sur l'axe x (à gauche)
+    if (zombie.x < 0) {
+      playerLives--;
+      zombies.splice(index, 1);
+    }
+    if (playerLives <= 0) {
+      noLoop();
+      document.getElementById('game-over').style.display = 'block';
     }
   });
 }
