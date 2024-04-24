@@ -1,57 +1,57 @@
-body, html {
-    margin: 0; /* Set margin to 0 */
-    padding: 0; /* Set padding to 0 */
-    height: 100%; /* Set height to 100% */
-    overflow: hidden; /* Hide overflow */
-    background-color: brown; /* Set background color to #000 */
+body, html { /* Represents the body and HTML elements of the page. */
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: brown;
 }
 
-#game-over, #menu {
-    display: none; /* Hide the elements with IDs "game-over" and "menu" */
-    position: absolute; /* Set position to absolute */
-    top: 50%; /* Set top position to 50% */
-    left: 50%; /* Set left position to 50% */
-    transform: translate(-50%, -50%); /* Translate the element to center it */
-    text-align: center; /* Center align the text */
+#game-over, #menu { /* Represents the game over and menu elements. */
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
 }
 
-#game-over button, #Play button {
-    font-size: 24px; /* Set font size to 24px */
-    padding: 10px; /* Set padding to 10px */
-    cursor: pointer; /* Set cursor to pointer */
+#game-over button, #Play button { /* Represents the game over and play buttons. */
+    font-size: 24px;
+    padding: 10px;
+    cursor: pointer;
 }
 
-canvas {
-    display: block; /* Set display to block */
-    margin: auto; /* Set margin to auto */
-    width: 100%; /* Set width to 100% */
-    height: calc(100% - 100px); /* Set height to 100% minus 100px */
+canvas { /* Represents the canvas element. */
+    display: block;
+    margin: auto;
+    width: 100%;
+    height: calc(100% - 100px);
 }
 
-#menu {
-    display: block; /* Set display to block */
-    width: 450px; /* Set width to 450px */
-    height: 100px; /* Set height to 100px */
-    font-size: 44px; /* Set font size to 44px */
-    color: rgb(156, 10, 10); /* Set color to RGB value */
-    font-family: "Blood Font", cursive; /* Set font family */
+#menu { /* Represents the menu element. */
+    display: block;
+    width: 450px;
+    height: 100px;
+    font-size: 44px;
+    color: rgb(156, 10, 10);
+    font-family: "Blood Font", cursive;
 }
 
-#Play button {
-    background-color: #bc2912; /* Set background color to #6ee7b7 */
-    color: white; /* Set text color to white */
-    border: none; /* Remove border */
-    border-radius: 5px; /* Set border radius to 5px */
-    border-top-right-radius: 30px; /* Set top right border radius to 30px */
-    border-bottom-right-radius: 30px; /* Set bottom right border radius to 30px */
+#Play button { /* Represents the play button. */
+    background-color: #bc2912;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
 }
 
-#SurvivorImage, #ZombieImage, #FireImage, #Zombieformenu {
-    position: absolute; /* Set position to absolute */
-    width: 200px; /* Set width to 200px */
-    height: 200px; /* Set height to 200px */
+#SurvivorImage, #ZombieImage, #FireImage, #Zombieformenu { /* Represents the survivor, zombie, fire, and zombie for menu images. */
+    position: absolute;
+    width: 200px;
+    height: 200px;
 }
 
-h1{
-    color: #b70808; /* Set color to #6ee7b7 */
+h1{ /* Represents the h1 element. */
+    color: #b70808;
 }
