@@ -1,56 +1,56 @@
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; 
-    
+    margin: 0; /* Set margin to 0 */
+    padding: 0; /* Set padding to 0 */
+    height: 100%; /* Set height to 100% */
+    overflow: hidden; /* Hide overflow */
 }
 
 #game-over, #menu {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    display: none; /* Hide the elements with IDs "game-over" and "menu" */
+    position: absolute; /* Set position to absolute */
+    top: 50%; /* Set top position to 50% */
+    left: 50%; /* Set left position to 50% */
+    transform: translate(-50%, -50%); /* Translate the element to center it */
+    text-align: center; /* Center align the text */
 }
 
 #game-over button, #Play button {
-    font-size: 24px;
-    padding: 10px;
-    cursor: pointer;
+    font-size: 24px; /* Set font size to 24px */
+    padding: 10px; /* Set padding to 10px */
+    cursor: pointer; /* Set cursor to pointer */
 }
 
 canvas {
-    display: block;
-    margin: auto;
-    width: 100%;
-    height: calc(100% - 100px);
+    display: block; /* Set display to block */
+    margin: auto; /* Set margin to auto */
+    width: 100%; /* Set width to 100% */
+    height: calc(100% - 100px); /* Set height to 100% minus 100px */
 }
+
 #menu {
-    display: block;
-    width: 450px;
-    height: 100px;
-    font-size: 44px;
-    color: rgb(156, 10, 10);
-    font-family: "Blood Font", cursive;
+    display: block; /* Set display to block */
+    width: 450px; /* Set width to 450px */
+    height: 100px; /* Set height to 100px */
+    font-size: 44px; /* Set font size to 44px */
+    color: rgb(156, 10, 10); /* Set color to RGB value */
+    font-family: "Blood Font", cursive; /* Set font family */
 }
 
 #Play button {
-    background-color: #a40101;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    border-top-right-radius: 30px;
-    border-bottom-right-radius: 30px;
+    background-color: #a40101; /* Set background color to #a40101 */
+    color: white; /* Set text color to white */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Set border radius to 5px */
+    border-top-right-radius: 30px; /* Set top right border radius to 30px */
+    border-bottom-right-radius: 30px; /* Set bottom right border radius to 30px */
 }
+
 #SurvivorImage, #ZombieImage, #FireImage, #Zombieformenu {
-    position: absolute;
-    width: 200px;
-    height: 200px;
+    position: absolute; /* Set position to absolute */
+    width: 200px; /* Set width to 200px */
+    height: 200px; /* Set height to 200px */
 }
 
 h1{
-    color: #6ee7b7;
-
+    color: #6ee7b7; /* Set color to #6ee7b7 */
 }
