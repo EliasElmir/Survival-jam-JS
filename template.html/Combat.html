@@ -1,29 +1,29 @@
-<!DOCTYPE html> <!-- Defines the document type as HTML -->
-<html lang="en"> <!-- Specifies the language of the document as English -->
-<head> <!-- Represents the head section of the HTML document -->
-    <meta charset="UTF-8"> <!-- Specifies the character encoding for the document as UTF-8 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Sets the viewport properties for responsive design -->
-    <title>Survival Z Game</title> <!-- Sets the title of the web page -->
-    <link rel="stylesheet" href="styles.css"> <!-- Links an external CSS file -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script> <!-- Includes the p5.js library -->
-    <script src="index.js"></script> <!-- Includes the index.js file -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Z Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="index.js"></script>
 </head>
-<body> <!-- Represents the body section of the HTML document -->
-    <!-- Menu section -->
-    <div id="menu"> <!-- Represents a container for the menu section -->
-        <h1>Survival Z</h1> <!-- Displays the game title -->
-        <div id="Play"> <!-- Represents a container for the play button -->
-            <button onclick="startGame()">Play</button> <!-- Displays a button to start the game -->
+<body>
+    <!-- Menu Section -->
+    <div id="menu">
+        <h1>Survival Z</h1>
+        <div id="Play">
+            <button onclick="startGame()">Play</button>
         </div>
     </div>
 
-    <!-- Game over section -->
-    <div id="game-over"> <!-- Represents a container for the game over section -->
-        <p>Game Over</p> <!-- Displays the game over message -->
-        <button id="restart-button">Restart</button> <!-- Displays a button to restart the game -->
+    <!-- Game Over Section -->
+    <div id="game-over">
+        <p>Game Over</p>
+        <button id="restart-button">Restart</button>
     </div>
 
-    <script> <!-- Represents a script section -->
+    <script>
         // Event listener for restart button
         document.getElementById('restart-button').addEventListener('click', function() {
             restartGame();
@@ -31,8 +31,8 @@
 
         // Function to start the game
         function startGame() {
-            document.getElementById('menu').style.display = 'none'; // Hides the menu section
-            PlayGame(); // Calls the PlayGame function
+            document.getElementById('menu').style.display = 'none';
+            PlayGame();
         }
     </script>
 </body>
