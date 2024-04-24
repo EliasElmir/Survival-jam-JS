@@ -11,7 +11,7 @@ let projectiledelay = 0.3;
 let lastSpawnTime = 0;
 let spawnDelay = 1000;
 let playerTeam = [];
-let conversiontozombieally = 0.5;
+let conversiontozombieally = 0.8;
 let maxzombiespawn = 3;
 let zombieSpeed = 2;
 let placezombieally = {
@@ -141,7 +141,11 @@ function projectilethrow() {
 
     for (let j = zombies.length - 1; j >= 0; j--) {
       if (projectiles[i] && projectiles[i].hits(zombies[j])) {
-        if (j < zombies.length && zombies[j] && !zombies[j].isFriendly && Math.random() < conversiontozombieally) {
+        console.log("Projectile hit a zombie.");
+        if (j < zombies.length && zombies[j] && !zombies[j].isFriendly) {
+          console.log("Trying to convert a zombie.");
+          if (Math.random() < conversiontozombieally) {
+            console.log("Conversion check passed.");
           let posKey = null;
           if (!placezombieally.front) {
             posKey = 'front';
@@ -156,6 +160,7 @@ function projectilethrow() {
           // If it is converted it is then placed in a free position defined by "placezombieally".
 
           if (posKey) {
+            console.log("Found a place for a new ally: " + posKey);
             zombies[j].isFriendly = true;
             switch (posKey) {
               case 'front':
@@ -188,14 +193,16 @@ function projectilethrow() {
     }
   }
 }
+}
 // In this part of the function, we manage what happens to the zombies. 
 // If the zombie becomes an ally it is added to the player's team and its place is saved. 
 // The score increases by 50 points. If the zombie's life is less than or equal to zero, it is removed from the zombie table and the score increases by another 50 points. 
 // The projectile is then removed.
 
 function zombielogical() {
-  updateGameLevel();
-  updateGameDifficulty();
+  if (frameCount % 60 === 0) {
+    updateGameLevel();
+  }
   let currentTime = millis();
   let spawnInterval = random(spawnDelay - 200, spawnDelay + 500);
   if (currentTime - lastSpawnTime > spawnInterval) {
@@ -213,10 +220,10 @@ function zombielogical() {
       playerLives--;
       zombies.splice(index, 1);
     }
-    if (zombie.x < 0) {
-      playerLives--;
-      zombies.splice(index, 1);
-    }
+    //if (zombie.x < 0) {
+      //playerLives--;
+      //zombies.splice(index, 1);
+    //}
     if (playerLives <= 0) {
       noLoop();
       document.getElementById('game-over').style.display = 'block';
@@ -414,6 +421,7 @@ function updateGameLevel() {
   let nextLevelScore = gameLevel * 1000;
   if (scorebarre >= nextLevelScore && gameLevel < 5) {
     gameLevel++;
+    console.log("Level Up: Now at Level " + gameLevel);
     updateGameDifficulty();
   }
 }
@@ -426,35 +434,35 @@ function updateGameDifficulty() {
     case 1:
       spawnDelay = 1000;
       projectiledelay = 0.3;
-      conversiontozombieally = 0.5;
+      conversiontozombieally = 0.8;
       zombieSpeed = 2;
       maxZombiesPerSpawn = 3;
       break;
     case 2:
       spawnDelay = 850;
       projectiledelay = 0.25;
-      conversiontozombieally = 0.45;
+      conversiontozombieally = 0.8;
       zombieSpeed = 2.5;
       maxZombiesPerSpawn = 5;
       break;
     case 3:
       spawnDelay = 700;
       projectiledelay = 0.2;
-      conversiontozombieally = 0.4;
+      conversiontozombieally = 0.9;
       zombieSpeed = 3;
       maxZombiesPerSpawn = 6;
       break;
     case 4:
       spawnDelay = 550;
       projectiledelay = 0.15;
-      conversiontozombieally = 0.35;
+      conversiontozombieally = 0.9;
       zombieSpeed = 3.5;
       maxZombiesPerSpawn = 7;
       break;
     case 5:
       spawnDelay = 400;
       projectiledelay = 0.1;
-      conversiontozombieally = 0.3;
+      conversiontozombieally = 0.9;
       zombieSpeed = 4;
       maxZombiesPerSpawn = 8;
       break;
