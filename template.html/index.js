@@ -30,7 +30,6 @@ const orderzombieally = {
   top: { x: 50, y: -60 },
   bottom: { x: 50, y: 60 }
 };
-
 let gameInitialized = false;
 
 function preload() {
@@ -329,6 +328,7 @@ class Projectile {
     return false;
   }
 }
+
 class Boss {
   constructor(x, y, size) {
     this.x = x;
