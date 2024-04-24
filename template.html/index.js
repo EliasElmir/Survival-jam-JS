@@ -78,11 +78,21 @@ function draw() {
 
   zombielogical();
 
-  for (let i = 0; i < playerTeam.length; i++) {
-    playerTeam[i].attack(zombies);
-    playerTeam[i].moveTowardsEnemy(zombies);
-    playerTeam[i].display();
+  for (let i = playerTeam.length - 1; i >= 0; i--) {
+  playerTeam[i].attack(zombies);
+  playerTeam[i].moveTowardsEnemy(zombies);
+  playerTeam[i].display();
+
+  if (playerTeam[i].x < 0 || playerTeam[i].x > width || playerTeam[i].y < 0 || playerTeam[i].y > height) {
+    for (const posKey in placezombieally) {
+      if (placezombieally[posKey] === playerTeam[i]) {
+        placezombieally[posKey] = null;
+        break;
+      }
+    }
+    playerTeam.splice(i, 1);
   }
+}
 
   handleZombieCombat();
 
