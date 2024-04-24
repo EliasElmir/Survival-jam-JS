@@ -61,6 +61,8 @@ function restartGame() {
   zombies = [];
   playerTeam = [];
   projectiles = [];
+  gameLevel = 1;
+  updateGameDifficulty();
   loop();
   document.getElementById('game-over').style.display = 'none';
 }
