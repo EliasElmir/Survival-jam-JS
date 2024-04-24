@@ -166,6 +166,7 @@ function projectilethrow() {
 }
 
 function zombielogical() {
+  updateGameLevel();
   let currentTime = millis();
   let spawnInterval = random(spawnDelay - 200, spawnDelay + 500);
   if (currentTime - lastSpawnTime > spawnInterval) {
@@ -349,6 +350,27 @@ class Projectile {
       }
     }
     return false;
+  }
+}
+
+function updateGameLevel() {
+  if (scorebarre >= 1300 && gameLevel === 1) {
+    gameLevel = 2;
+    updateGameDifficulty();
+  }
+}
+function updateGameDifficulty() {
+  switch (gameLevel) {
+    case 2:
+      spawnDelay = 800;
+      projectiledelay = 0.3;
+      conversiontozombieally = 0.4;
+      break;
+    default:
+      spawnDelay = 1000;
+      projectiledelay = 0.4;
+      conversiontozombieally = 0.5;
+      break;
   }
 }
 
