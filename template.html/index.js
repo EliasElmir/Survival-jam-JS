@@ -67,7 +67,7 @@ function draw() {
   player.display();
   player.move();
 
-  updateAllyPositions();
+  
 
   updateGameLevel();
 
@@ -195,14 +195,6 @@ function zombielogical() {
   });
 }
 
-function updateAllyPositions() {
-  Object.entries(placezombieally).forEach(([key, zombie]) => {
-      if (zombie) {
-          zombie.x = player.x + orderzombieally[key].x;
-          zombie.y = player.y + orderzombieally[key].y;
-      }
-  });
-}
 
 function displayInfo() {
   fill(0);
