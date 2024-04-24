@@ -3,6 +3,7 @@ body, html {
     padding: 0; /* Set padding to 0 */
     height: 100%; /* Set height to 100% */
     overflow: hidden; /* Hide overflow */
+    background-color: brown; /* Set background color to #000 */
 }
 
 #game-over, #menu {
@@ -37,7 +38,7 @@ canvas {
 }
 
 #Play button {
-    background-color: #a40101; /* Set background color to #a40101 */
+    background-color: #bc2912; /* Set background color to #6ee7b7 */
     color: white; /* Set text color to white */
     border: none; /* Remove border */
     border-radius: 5px; /* Set border radius to 5px */
@@ -52,5 +53,5 @@ canvas {
 }
 
 h1{
-    color: #6ee7b7; /* Set color to #6ee7b7 */
+    color: #b70808; /* Set color to #6ee7b7 */
 }
